@@ -1,10 +1,10 @@
 services:
   database:
-    image: mysql:8
-    container_name: adjdb
+    image: mysql:8.0
+    container_name: adj-database
     environment:
-      MYSQL_ROOT: root
-      MYSQL_DATABASE: adjdemo
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=adjdemo
     ports:
       - "3307:3306"
     volumes:
@@ -13,39 +13,38 @@ services:
       - adj-net
     restart: unless-stopped
   frontend:
-    image: client:latest
+    image: client:lastest
     build:
       context: ./client
       args:
         API_HOST: localhost
         API_PORT: 8000
         API_BASE: /adj-api
-      dockerfile: Dockerfile
     container_name: adj-client
     ports:
       - "3000:80"
     networks:
-      - adj-net
+      - 'adj-net'
     restart: unless-stopped
     depends_on:
       - database
   backend:
-    image: server:latest
+    image: server:lastest
     build:
       context: ./server
-      dockerfile: Dockerfile
     container_name: adj-server
     environment:
-      - SERVER_PORT=8080
-      - DB_HOST=database
-      - DB_PORT=3306
-      - DB_NAME=adjdemo
-      - DB_USER=root
-      - DB_PASSWORD=root
+      SERVER_PORT: 8080
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_NAME: adjdemo
+      DB_USER: root
+      DB_PASSWORD: root
     ports:
       - "8000:8080"
     networks:
-      - adj-net
+      - 'adj-net'
+    restart: unless-stopped
     depends_on:
       - frontend
 
